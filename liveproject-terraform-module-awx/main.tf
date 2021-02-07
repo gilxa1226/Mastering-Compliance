@@ -3,9 +3,13 @@ terraform {
         aws = {
             source  = "hashicorp/aws"
             version = "~> 3.0" 
-            region  = "us-west-2"
         }
     }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-2"
 }
 
 data "aws_ami" "RHEL" {
