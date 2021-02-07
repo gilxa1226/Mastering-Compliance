@@ -48,6 +48,6 @@ resource "aws_security_group_rule" "ssh-ingress" {
     from_port         = 22
     to_port           = 22
     protocol          = "tcp"
-    cidr_blocks       = [module.vpc.public_subnets, "65.189.48.218/32"]
+    cidr_blocks       = [module.vpc.public_subnets]
     security_group_id = aws_security_group.awx_sg.id
 }
