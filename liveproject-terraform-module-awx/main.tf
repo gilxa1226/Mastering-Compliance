@@ -57,7 +57,7 @@ resource "aws_vpc" "awx-public" {
 
 resource "aws_subnet" "awx-subnet" {
   vpc_id            = aws_vpc.awx-public.id
-  cidr_block        = "10.1.0.0/24"
+  cidr_block        = "10.1.0.0/28"
 
   tags = {
     Name = "awx subnet"
