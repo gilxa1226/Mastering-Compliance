@@ -75,7 +75,7 @@ resource "aws_subnet" "awx-private-subnet" {
 
 resource "aws_network_interface" "awx-interface" {
   subnet_id   = aws_subnet.awx-public-subnet.id
-  private_ips = ["10.1.0.10"]
+  private_ips = ["10.1.2.10"]
 
   tags = {
     Name = "awx primary interface"
