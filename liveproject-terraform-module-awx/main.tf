@@ -14,11 +14,11 @@ provider "aws" {
 
 data "aws_ami" "RHEL" {
     most_recent     = true
-    architecture    = "x86_64"
+    owners          = ["309956199498"] # RedHat
 
     filter {
         name    = "name"
-        values  = [ "RHEL-8.3.0*" ]
+        values  = [ "RHEL-8.3.0_HVM*-x86_64*" ]
     }   
 
     filter {
