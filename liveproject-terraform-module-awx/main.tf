@@ -73,6 +73,37 @@ resource "aws_subnet" "awx-private-subnet" {
   }
 }
 
+resource "aws_nat_gateway" "awx-nat-gw" {
+  allocation_id = aws_vpc.awx.id
+  subnet_id     = aws_subnet.awx-private-subnet.id
+
+  tags = {
+    Name = "AWX NAT GW"
+    Cluster = "none"
+    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
+    Environment = "dev"
+    Creator = "terraform"
+    Expires = "Never"
+    Service = "nat-gw"
+    Management = "terraform"
+  }
+}
+
+resource "aws_internet_gateway" "awx-internet-gw" {
+  vpc_id = aws_vpc.awx.id
+
+  tags = {
+    Name = "awx-internet-gw"
+    Cluster = "none"
+    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
+    Environment = "dev"
+    Creator = "terraform"
+    Expires = "Never"
+    Service = "internet-gw"
+    Management = "terraform"
+  }
+}
+
 resource "aws_network_interface" "awx-interface" {
   subnet_id   = aws_subnet.awx-public-subnet.id
   private_ips = ["10.1.2.10"]
