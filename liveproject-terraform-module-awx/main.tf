@@ -1,16 +1,3 @@
-terraform {
-    required_providers {
-        aws = {
-            source  = "hashicorp/aws"
-            version = "~> 3.0" 
-        }
-    }
-}
-
-# Configure the AWS Provider
-provider "aws" {
-  region = "us-east-2"
-}
 
 data "aws_ami" "RHEL" {
     most_recent     = true
@@ -27,97 +14,9 @@ data "aws_ami" "RHEL" {
     }
 }
 
-resource "aws_vpc" "awx" {
-    cidr_block  = "10.1.0.0/16"
-    tags = {
-        Name = "awx-private"
-        Cluster = "none"
-        Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-        Environment = "dev"
-        Creator = "terraform"
-        Expires = "Never"
-        Service = "private subnet"
-        Management = "terraform"
-    }
-}
-
-resource "aws_subnet" "awx-public-subnet" {
-  vpc_id            = aws_vpc.awx.id
-  cidr_block        = "10.1.2.0/24"
-
-  tags = {
-    Name = "awx public subnet"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "awx"
-    Management = "terraform"
-  }
-}
-
-resource "aws_subnet" "awx-private-subnet" {
-  vpc_id            = aws_vpc.awx.id
-  cidr_block        = "10.1.3.0/24"
-
-  tags = {
-    Name = "awx private subnet"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "awx"
-    Management = "terraform"
-  }
-}
-
-resource "aws_nat_gateway" "awx-nat-gw" {
-  allocation_id = aws_vpc.awx.id
-  subnet_id     = aws_subnet.awx-private-subnet.id
-
-  tags = {
-    Name = "AWX NAT GW"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "nat-gw"
-    Management = "terraform"
-  }
-}
-
-resource "aws_internet_gateway" "awx-internet-gw" {
-  vpc_id = aws_vpc.awx.id
-
-  tags = {
-    Name = "awx-internet-gw"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "internet-gw"
-    Management = "terraform"
-  }
-}
-
-resource "aws_network_interface" "awx-interface" {
-  subnet_id   = aws_subnet.awx-public-subnet.id
-  private_ips = ["10.1.2.10"]
-
-  tags = {
-    Name = "awx primary interface"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "awx"
-    Management = "terraform"
-  }
+module "networking" {
+    source = "./modules/networking"
+    namespace = var.namespace
 }
 
 resource "aws_key_pair" "deployer" {
@@ -139,12 +38,6 @@ resource "aws_key_pair" "deployer" {
 resource "aws_instance" "awx" {
     ami = data.aws_ami.RHEL.id
     instance_type = "t2.medium"
-
-    network_interface {
-        network_interface_id = aws_network_interface.awx-interface.id
-        device_index         = 0
-    }
-
     tags = {
         Name = "awx"
         Cluster = "none"
@@ -171,37 +64,4 @@ resource "aws_eip" "awx-ip" {
         Service = "awx"
         Management = "terraform"
     }
-}
-
-# Create a new security group for AWX
-resource "aws_security_group" "allow_awx_ssh" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
-  vpc_id      = aws_vpc.awx.id
-
-  ingress {
-    description = "SSH to VPN"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["65.189.48.218/32"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "allow_awx_ssh"
-    Cluster = "none"
-    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
-    Environment = "dev"
-    Creator = "terraform"
-    Expires = "Never"
-    Service = "ssh"
-    Management = "terraform"
-  }
 }
