@@ -173,3 +173,35 @@ resource "aws_eip" "awx-ip" {
     }
 }
 
+# Create a new security group for AWX
+resource "aws_security_group" "allow_awx_ssh" {
+  name        = "allow_ssh"
+  description = "Allow SSH inbound traffic"
+  vpc_id      = aws_vpc.awx.id
+
+  ingress {
+    description = "SSH to VPN"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["65.189.48.218/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_awx_ssh"
+    Cluster = "none"
+    Project = "Mastering Compliance with Ansible, Terraform, and OpenSCAP"
+    Environment = "dev"
+    Creator = "terraform"
+    Expires = "Never"
+    Service = "ssh"
+    Management = "terraform"
+  }
+}
