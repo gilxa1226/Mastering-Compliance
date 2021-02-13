@@ -159,9 +159,9 @@ resource "aws_instance" "awx-instance" {
     sudo -u ec2-user git clone -b 13.0.0 https://github.com/ansible/awx.git /home/ec2-user/awx
     # 10. Create a minimal variable file that Ansible installation playbook needs
     cat <<VEOF > /home/ec2-user/awx/installer/vars.yml
-    admin_password: '0p2qbWvW3HFS'
-    pg_password: 'x9p97ldwigtT'
-    secret_key: '0QpsgYALr7BC'
+    admin_password: ''
+    pg_password: ''
+    secret_key: ''
     VEOF
     # 11. Run the installation Ansible playbook, this will take a few minutes
     sudo -u ec2-user ansible-playbook -i /home/ec2-user/awx/installer/inventory /home/ec2-user/awx/installer/install.yml -e @/home/ec2-user/awx/installer/vars.yml

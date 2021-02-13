@@ -12,7 +12,7 @@ variable "namespace" {
 
 variable "ssh_keypair" {
     description = "Optional ssh keypair to use for EC2 instance"
-    default     = null
+    default     = "liveproject"
     type        = string
 }
 
