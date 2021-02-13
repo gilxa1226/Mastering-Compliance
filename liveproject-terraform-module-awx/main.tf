@@ -22,7 +22,7 @@ resource "aws_vpc" "awx-vpc" {
 
 # Create an internet gateway for AWX
 resource "aws_internet_gateway" "awx-internet-gateway" {
-    vpc_id = aws_vpc.awx-vpc.allocation_id
+    vpc_id = aws_vpc.awx-vpc.id
     tags = var.tags
 }
 
