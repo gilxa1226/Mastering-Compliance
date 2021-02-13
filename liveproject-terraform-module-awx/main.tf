@@ -1,3 +1,19 @@
+
+data "aws_ami" "RHEL" {
+    most_recent     = true
+    owners          = ["309956199498"] # RedHat
+
+    filter {
+        name    = "name"
+        values  = [ "RHEL-8.3.0_HVM*-x86_64*" ]
+    }   
+
+    filter {
+        name    = "virtualization-type"
+        values  = [ "hvm" ]
+    }
+}
+
 # Create a VPC
 resource "aws_vpc" "awx-vpc" {
     cidr_block  = "10.0.0.0/16"
@@ -113,9 +129,9 @@ resource "aws_security_group" "allow_web_and_ssh" {
 
 # Create a RHEL8 server and install AWX on it
 resource "aws_instance" "awx-instance" {
-  ami                         = var.region_ami["${var.region}"]
+  ami                         = data.aws_ami.RHEL.id
   instance_type               = "t2.medium"
-  key_name                    = var.keypair
+  key_name                    = var.ssh_keypair
   subnet_id                   = aws_subnet.awx-public-subnet.id
   associate_public_ip_address = true
   security_groups             = [aws_security_group.allow_web_and_ssh.id]
